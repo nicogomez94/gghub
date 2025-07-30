@@ -32,6 +32,12 @@ export default function ExcelUpload() {
   const [totalUSD, setTotalUSD] = useState(null);
   const [gastoFijo, setGastoFijo] = useState(50000);
 
+  const recalcGanancia = (rows) => {
+    const totalPagoVerdaderoUSD = rows.reduce((acc, row) => acc + (parseFloat(row[6]) || 0), 0);
+    setTotalUSD(totalPagoVerdaderoUSD);
+    setGanancia((totalPagoVerdaderoUSD * DOLAR) - gastoFijo);
+  };
+
   const handleDepartamento = (e) => {
     const dep = e.target.value;
     setDepartamento(dep);
@@ -43,6 +49,10 @@ export default function ExcelUpload() {
     } else {
       setGastoFijo(50000);
     }
+    // Limpiar tabla al cambiar dpto
+    setData([]);
+    setGanancia(null);
+    setTotalUSD(null);
   };
 
   const handleFile = (e) => {
@@ -72,13 +82,23 @@ export default function ExcelUpload() {
         );
       });
       setData(newData);
-      // Calcular suma de Pago VERDADERO en USD
-      const totalPagoVerdaderoUSD = newData.reduce((acc, row) => acc + (parseFloat(row[6]) || 0), 0);
-      setTotalUSD(totalPagoVerdaderoUSD);
-      // Calcular ganancia neta en pesos
-      setGanancia((totalPagoVerdaderoUSD * DOLAR) - gastoFijo);
+      recalcGanancia(newData);
     };
     reader.readAsBinaryString(file);
+  };
+
+  const handleDelete = (i) => {
+    const newData = data.filter((_, idx) => idx !== i);
+    setData(newData);
+    recalcGanancia(newData);
+  };
+
+  const handleEditPagoVerdadero = (i, value) => {
+    const newData = data.map((row, idx) =>
+      idx === i ? [...row.slice(0, 6), value] : row
+    );
+    setData(newData);
+    recalcGanancia(newData);
   };
 
   return (
@@ -100,12 +120,31 @@ export default function ExcelUpload() {
             <thead>
               <tr>
                 {COLUMNAS.map((col, i) => <th key={i}>{col}</th>)}
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {data.map((row, i) => (
                 <tr key={i}>
-                  {row.map((cell, j) => <td key={j}>{cell}</td>)}
+                  {row.map((cell, j) =>
+                    j === 6 ? (
+                      <td key={j}>
+                        <input
+                          type="number"
+                          value={cell}
+                          min="0"
+                          step="0.01"
+                          style={{width:'90px'}}
+                          onChange={e => handleEditPagoVerdadero(i, e.target.value)}
+                        />
+                      </td>
+                    ) : (
+                      <td key={j}>{cell}</td>
+                    )
+                  )}
+                  <td>
+                    <button onClick={() => handleDelete(i)} style={{color:'#fff',background:'#e74c3c',border:'none',borderRadius:'4px',padding:'0.3rem 0.7rem',cursor:'pointer'}}>Borrar</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
