@@ -1,4 +1,4 @@
-import ExcelUpload from './ExcelUpload';
+import ExcelMultiUpload from './ExcelMultiUpload';
 import GastosForm from './GastosForm';
 import { useState } from 'react';
 import './App.css';
@@ -10,10 +10,10 @@ function App() {
     <div className="App">
       <h1>Control de Reservas - Importar Excel</h1>
       <nav style={{marginBottom:'2rem'}}>
-        <button onClick={() => setPantalla('excel')}>Importar Excel</button>
+        <button onClick={() => setPantalla('excel')}>Importar Excels</button>
         <button onClick={() => setPantalla('gastos')}>Cargar Gastos Fijos</button>
       </nav>
-      {pantalla === 'excel' ? <ExcelUpload /> : <GastosForm />}
+      {pantalla === 'excel' ? <ExcelMultiUpload /> : <GastosForm />}
     </div>
   );
 }

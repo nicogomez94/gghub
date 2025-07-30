@@ -14,7 +14,7 @@ export default function GastosForm() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
-    const saved = sessionStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) setGastos(JSON.parse(saved));
   }, []);
 
@@ -24,8 +24,8 @@ export default function GastosForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(gastos));
-    setMsg('Gastos guardados en esta sesión');
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(gastos));
+    setMsg('Gastos guardados en este navegador');
   };
 
   return (
