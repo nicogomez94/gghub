@@ -13,6 +13,13 @@ const COLUMNAS = [
   'Pago VERDADERO'
 ];
 
+const GASTOS_FIJOS = {
+  arenales: 50000,
+  tucuman: 50000,
+  paraguay: 50000
+};
+const DOLAR = 1300;
+
 function parsePrice(value) {
   if (typeof value === 'number') return value;
   if (typeof value === 'string') {
@@ -23,11 +30,14 @@ function parsePrice(value) {
 }
 
 export default function ExcelUpload() {
+  const [departamento, setDepartamento] = useState('');
   const [data, setData] = useState([]);
+  const [ganancia, setGanancia] = useState(null);
+  const [totalUSD, setTotalUSD] = useState(null);
 
   const handleFile = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || !departamento) return;
     const reader = new FileReader();
     reader.onload = (evt) => {
       const bstr = evt.target.result;
@@ -52,6 +62,11 @@ export default function ExcelUpload() {
         );
       });
       setData(newData);
+      // Calcular suma de Pago VERDADERO en USD
+      const totalPagoVerdaderoUSD = newData.reduce((acc, row) => acc + (parseFloat(row[6]) || 0), 0);
+      setTotalUSD(totalPagoVerdaderoUSD);
+      // Calcular ganancia neta en pesos
+      setGanancia((totalPagoVerdaderoUSD * DOLAR) - (GASTOS_FIJOS[departamento] || 0));
     };
     reader.readAsBinaryString(file);
   };
@@ -59,8 +74,17 @@ export default function ExcelUpload() {
   return (
     <div className="excel-upload">
       <h2>Subir archivo Excel</h2>
-      <input type="file" accept=".xlsx,.xls" onChange={handleFile} />
+      <label style={{fontWeight:600,marginBottom:'1rem',display:'block'}}>Departamento:
+        <select value={departamento} onChange={e => setDepartamento(e.target.value)} required>
+          <option value="">Seleccionar...</option>
+          <option value="arenales">Arenales</option>
+          <option value="tucuman">Tucuman</option>
+          <option value="paraguay">Paraguay</option>
+        </select>
+      </label>
+      <input type="file" accept=".xlsx,.xls" onChange={handleFile} disabled={!departamento} />
       {data.length > 0 && (
+        <>
         <div className="excel-table-wrapper">
           <table className="excel-table">
             <thead>
@@ -77,6 +101,14 @@ export default function ExcelUpload() {
             </tbody>
           </table>
         </div>
+        <div className="ganancia-final">
+          <strong>Gastos fijos {departamento}: </strong>ARS {GASTOS_FIJOS[departamento]}
+          <br/>
+          <strong>Total Pago VERDADERO (USD): </strong>{totalUSD?.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}
+          <br/>
+          <strong>Ganancia neta del mes (en pesos): </strong>ARS {ganancia?.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})}
+        </div>
+        </>
       )}
     </div>
   );

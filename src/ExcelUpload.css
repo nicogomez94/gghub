@@ -45,3 +45,29 @@
 .excel-table tr:hover td {
   background: #f0f4ff;
 }
+.ganancia-final {
+  margin: 2rem auto 0 auto;
+  max-width: 600px;
+  background: #f7fbe7;
+  border: 1px solid #c6e1a7;
+  border-radius: 8px;
+  padding: 1.5rem 2rem;
+  font-size: 1.2rem;
+  color: #2d4a1b;
+  text-align: left;
+  box-shadow: 0 1px 4px #0001;
+}
+.ganancia-final strong {
+  color: #1a2b0a;
+}
+.excel-upload label select {
+  margin-left: 1rem;
+  font-size: 1rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+}
+.excel-upload label {
+  margin-bottom: 1.5rem;
+  display: block;
+}
