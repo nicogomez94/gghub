@@ -1,0 +1,43 @@
+.reserva-form {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafbfc;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.reserva-form h2 {
+  margin-bottom: 1rem;
+}
+.reserva-form label {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  font-weight: 500;
+  gap: 0.25rem;
+}
+.reserva-form input[type="text"],
+.reserva-form input[type="number"],
+.reserva-form input[type="date"] {
+  padding: 0.5rem;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.reserva-form button {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #646cff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.reserva-form button:hover {
+  background: #4b51c6;
+}

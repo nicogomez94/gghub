@@ -1,0 +1,47 @@
+.excel-upload {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  background: #fcfcff;
+  box-shadow: 0 2px 8px #0001;
+}
+.excel-upload h2 {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+}
+.excel-upload input[type="file"] {
+  margin-bottom: 2rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.excel-table-wrapper {
+  overflow-x: auto;
+}
+.excel-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  font-size: 1.05rem;
+}
+.excel-table th, .excel-table td {
+  border: 1px solid #bfc4d1;
+  padding: 0.7rem 1rem;
+  text-align: left;
+}
+.excel-table th {
+  background: #eaeaff;
+  font-weight: 700;
+  color: #222;
+}
+.excel-table tr:nth-child(even) td {
+  background: #f6f7fa;
+}
+.excel-table tr:hover td {
+  background: #f0f4ff;
+}
