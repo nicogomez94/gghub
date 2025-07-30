@@ -37,7 +37,7 @@ function procesarExcel(file, gastoFijo) {
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      if (!json[0]) return resolve({ data: [], totalUSD: 0, ganancia: 0 });
+      if (!json[0]) return resolve({ data: [], totalUSD: 0, ganancia: 0, ocupacion: 0 });
       const header = json[0];
       const idx = {
         guest: header.findIndex(h => h && h.toLowerCase().includes('guest name')),
@@ -47,15 +47,29 @@ function procesarExcel(file, gastoFijo) {
         status: header.findIndex(h => h && h.toLowerCase().includes('status')),
         price: header.findIndex(h => h && h.toLowerCase().includes('price')),
       };
+      let ocupacion = 0;
       const data = json.slice(1).map(row => {
         let guest = row[idx.guest];
         if (!guest || guest === '') guest = row[idx.booked] || '';
         const price = parsePrice(row[idx.price]);
         const pagoVerdadero = price ? (price - price * 0.10).toFixed(2) : '';
+        // Calcular días ocupados
+        let dias = 0;
+        const checkin = row[idx.checkin];
+        const checkout = row[idx.checkout];
+        if (checkin && checkout) {
+          const d1 = new Date(checkin);
+          const d2 = new Date(checkout);
+          if (!isNaN(d1) && !isNaN(d2) && d2 > d1) {
+            dias = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+            if (dias < 0) dias = 0;
+          }
+        }
+        ocupacion += dias;
         return [
           guest,
-          row[idx.checkin] || '',
-          row[idx.checkout] || '',
+          checkin || '',
+          checkout || '',
           row[idx.status] || '',
           row[idx.price] || '',
           pagoVerdadero
@@ -63,7 +77,7 @@ function procesarExcel(file, gastoFijo) {
       });
       const totalUSD = data.reduce((acc, row) => acc + (parseFloat(row[5]) || 0), 0);
       const ganancia = (totalUSD * DOLAR) - gastoFijo;
-      resolve({ data, totalUSD, ganancia });
+      resolve({ data, totalUSD, ganancia, ocupacion });
     };
     reader.readAsBinaryString(file);
   });
@@ -101,9 +115,9 @@ export default function ExcelMultiUpload() {
     for (const dep of DEPARTAMENTOS) {
       const file = archivos[dep.key];
       if (file) {
-        const { data, totalUSD, ganancia } = await procesarExcel(file, Number(gastosFijos[dep.key]) || 50000);
-        nuevasTablas[dep.key] = { data, totalUSD, ganancia };
-        nuevoResumen[dep.key] = { totalUSD, ganancia };
+        const { data, totalUSD, ganancia, ocupacion } = await procesarExcel(file, Number(gastosFijos[dep.key]) || 50000);
+        nuevasTablas[dep.key] = { data, totalUSD, ganancia, ocupacion };
+        nuevoResumen[dep.key] = { totalUSD, ganancia, ocupacion };
         nuevosVisibles[dep.key] = false; // oculto por defecto
       }
     }
@@ -117,6 +131,7 @@ export default function ExcelMultiUpload() {
   };
 
   const totalFinal = Object.values(resumen).reduce((acc, r) => acc + (r.ganancia || 0), 0);
+  const ocupacionTotal = Object.values(resumen).reduce((acc, r) => acc + (r.ocupacion || 0), 0);
 
   return (
     <div className="excel-upload">
@@ -167,6 +182,8 @@ export default function ExcelMultiUpload() {
                   <strong>Total Pago VERDADERO (USD): </strong>{tablas[dep.key].totalUSD?.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}
                   <br/>
                   <strong>Ganancia neta del mes (en pesos): </strong>ARS {tablas[dep.key].ganancia?.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})}
+                  <br/>
+                  <strong>Días ocupados en el mes: </strong>{tablas[dep.key].ocupacion}
                 </div>
               </>
             )}
@@ -178,11 +195,12 @@ export default function ExcelMultiUpload() {
           <h3>Resumen final</h3>
           {DEPARTAMENTOS.map(dep => (
             <div key={dep.key}>
-              <strong>{dep.label}:</strong> ARS {resumen[dep.key]?.ganancia?.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})}
+              <strong>{dep.label}:</strong> ARS {resumen[dep.key]?.ganancia?.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})} | Días ocupados: {resumen[dep.key]?.ocupacion}
             </div>
           ))}
           <div style={{marginTop:'1rem',fontWeight:'bold',fontSize:'1.2rem'}}>
-            Ganancia total: ARS {totalFinal.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})}
+            Ganancia total: ARS {totalFinal.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})} <br/>
+            Ocupación total del mes: {ocupacionTotal} días
           </div>
         </div>
       )}
