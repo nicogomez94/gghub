@@ -4,7 +4,7 @@ import './ExcelUpload.css';
 
 // Columnas a mostrar y su orden
 const COLUMNAS = [
-  'Book Num',
+  //'Book Num', // Ocultar Book Num
   'Guest Name(s)',
   'Check-in',
   'Check-out',
@@ -33,7 +33,7 @@ export default function ExcelUpload() {
   const [gastoFijo, setGastoFijo] = useState(50000);
 
   const recalcGanancia = (rows) => {
-    const totalPagoVerdaderoUSD = rows.reduce((acc, row) => acc + (parseFloat(row[6]) || 0), 0);
+    const totalPagoVerdaderoUSD = rows.reduce((acc, row) => acc + (parseFloat(row[5]) || 0), 0);
     setTotalUSD(totalPagoVerdaderoUSD);
     setGanancia((totalPagoVerdaderoUSD * DOLAR) - gastoFijo);
   };
@@ -66,20 +66,31 @@ export default function ExcelUpload() {
       const ws = wb.Sheets[wsname];
       const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
       if (!json[0]) return;
-      // Mapear columnas a índice
       const header = json[0];
-      const idx = {};
-      COLUMNAS.forEach(col => {
-        if (col === 'Pago VERDADERO') return;
-        idx[col] = header.findIndex(h => h && h.toLowerCase().replace(/\s/g, '') === col.toLowerCase().replace(/\s/g, ''));
-      });
+      // Índices de columnas
+      const idx = {
+        guest: header.findIndex(h => h && h.toLowerCase().includes('guest name')),
+        booked: header.findIndex(h => h && h.toLowerCase().includes('booked by')),
+        checkin: header.findIndex(h => h && h.toLowerCase().includes('check-in')),
+        checkout: header.findIndex(h => h && h.toLowerCase().includes('check-out')),
+        status: header.findIndex(h => h && h.toLowerCase().includes('status')),
+        price: header.findIndex(h => h && h.toLowerCase().includes('price')),
+      };
       // Procesar filas
       const newData = json.slice(1).map(row => {
-        const price = parsePrice(row[idx['Price']]);
+        // Guest name: si está vacío, usar Booked by
+        let guest = row[idx.guest];
+        if (!guest || guest === '') guest = row[idx.booked] || '';
+        const price = parsePrice(row[idx.price]);
         const pagoVerdadero = price ? (price - price * 0.10).toFixed(2) : '';
-        return COLUMNAS.map(col =>
-          col === 'Pago VERDADERO' ? pagoVerdadero : row[idx[col]] || ''
-        );
+        return [
+          guest,
+          row[idx.checkin] || '',
+          row[idx.checkout] || '',
+          row[idx.status] || '',
+          row[idx.price] || '',
+          pagoVerdadero
+        ];
       });
       setData(newData);
       recalcGanancia(newData);
@@ -95,7 +106,7 @@ export default function ExcelUpload() {
 
   const handleEditPagoVerdadero = (i, value) => {
     const newData = data.map((row, idx) =>
-      idx === i ? [...row.slice(0, 6), value] : row
+      idx === i ? [...row.slice(0, 5), value] : row
     );
     setData(newData);
     recalcGanancia(newData);
@@ -127,7 +138,7 @@ export default function ExcelUpload() {
               {data.map((row, i) => (
                 <tr key={i}>
                   {row.map((cell, j) =>
-                    j === 6 ? (
+                    j === 5 ? (
                       <td key={j}>
                         <input
                           type="number"
