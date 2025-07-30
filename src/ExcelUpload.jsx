@@ -13,11 +13,7 @@ const COLUMNAS = [
   'Pago VERDADERO'
 ];
 
-const GASTOS_FIJOS = {
-  arenales: 50000,
-  tucuman: 50000,
-  paraguay: 50000
-};
+const STORAGE_KEY = 'gastos_fijos_dptos';
 const DOLAR = 1300;
 
 function parsePrice(value) {
@@ -34,6 +30,20 @@ export default function ExcelUpload() {
   const [data, setData] = useState([]);
   const [ganancia, setGanancia] = useState(null);
   const [totalUSD, setTotalUSD] = useState(null);
+  const [gastoFijo, setGastoFijo] = useState(50000);
+
+  const handleDepartamento = (e) => {
+    const dep = e.target.value;
+    setDepartamento(dep);
+    // Leer gastos fijos de sessionStorage
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const gastos = JSON.parse(saved);
+      setGastoFijo(Number(gastos[dep]) || 50000);
+    } else {
+      setGastoFijo(50000);
+    }
+  };
 
   const handleFile = (e) => {
     const file = e.target.files[0];
@@ -66,7 +76,7 @@ export default function ExcelUpload() {
       const totalPagoVerdaderoUSD = newData.reduce((acc, row) => acc + (parseFloat(row[6]) || 0), 0);
       setTotalUSD(totalPagoVerdaderoUSD);
       // Calcular ganancia neta en pesos
-      setGanancia((totalPagoVerdaderoUSD * DOLAR) - (GASTOS_FIJOS[departamento] || 0));
+      setGanancia((totalPagoVerdaderoUSD * DOLAR) - gastoFijo);
     };
     reader.readAsBinaryString(file);
   };
@@ -75,7 +85,7 @@ export default function ExcelUpload() {
     <div className="excel-upload">
       <h2>Subir archivo Excel</h2>
       <label style={{fontWeight:600,marginBottom:'1rem',display:'block'}}>Departamento:
-        <select value={departamento} onChange={e => setDepartamento(e.target.value)} required>
+        <select value={departamento} onChange={handleDepartamento} required>
           <option value="">Seleccionar...</option>
           <option value="arenales">Arenales</option>
           <option value="tucuman">Tucuman</option>
@@ -102,7 +112,7 @@ export default function ExcelUpload() {
           </table>
         </div>
         <div className="ganancia-final">
-          <strong>Gastos fijos {departamento}: </strong>ARS {GASTOS_FIJOS[departamento]}
+          <strong>Gastos fijos {departamento}: </strong>ARS {gastoFijo}
           <br/>
           <strong>Total Pago VERDADERO (USD): </strong>{totalUSD?.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}
           <br/>

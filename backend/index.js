@@ -26,7 +26,30 @@ let db;
     comisiones REAL DEFAULT 0,
     otros REAL DEFAULT 0
   )`);
+  await db.exec(`CREATE TABLE IF NOT EXISTS gastos (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    arenales REAL DEFAULT 50000,
+    tucuman REAL DEFAULT 50000,
+    paraguay REAL DEFAULT 50000
+  )`);
+  // Insertar fila única si no existe
+  const row = await db.get('SELECT * FROM gastos WHERE id=1');
+  if (!row) {
+    await db.run('INSERT INTO gastos (id, arenales, tucuman, paraguay) VALUES (1, 50000, 50000, 50000)');
+  }
 })();
+// Obtener gastos fijos
+app.get('/api/gastos', async (req, res) => {
+  const row = await db.get('SELECT arenales, tucuman, paraguay FROM gastos WHERE id=1');
+  res.json(row || { arenales: 50000, tucuman: 50000, paraguay: 50000 });
+});
+
+// Guardar gastos fijos
+app.post('/api/gastos', async (req, res) => {
+  const { arenales, tucuman, paraguay } = req.body;
+  await db.run('UPDATE gastos SET arenales=?, tucuman=?, paraguay=? WHERE id=1', [arenales, tucuman, paraguay]);
+  res.json({ ok: true });
+});
 
 // Crear reserva
 app.post('/api/reservas', async (req, res) => {
