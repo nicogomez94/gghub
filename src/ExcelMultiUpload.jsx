@@ -81,25 +81,35 @@ export default function ExcelMultiUpload() {
     return { arenales: 50000, tucuman: 50000, paraguay: 50000 };
   })();
 
-  const handleFile = (e, dpto) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setArchivos(a => ({ ...a, [dpto]: file }));
+  const handleFiles = (e) => {
+    const files = Array.from(e.target.files);
+    // Emparejar por nombre de archivo
+    const nuevosArchivos = {};
+    files.forEach(file => {
+      const name = file.name.toLowerCase();
+      if (name.includes('arenales')) nuevosArchivos['arenales'] = file;
+      else if (name.includes('tucuman')) nuevosArchivos['tucuman'] = file;
+      else if (name.includes('paraguay')) nuevosArchivos['paraguay'] = file;
+    });
+    setArchivos(nuevosArchivos);
   };
 
   const handleProcesar = async () => {
     const nuevasTablas = {};
     const nuevoResumen = {};
+    const nuevosVisibles = {};
     for (const dep of DEPARTAMENTOS) {
       const file = archivos[dep.key];
       if (file) {
         const { data, totalUSD, ganancia } = await procesarExcel(file, Number(gastosFijos[dep.key]) || 50000);
         nuevasTablas[dep.key] = { data, totalUSD, ganancia };
         nuevoResumen[dep.key] = { totalUSD, ganancia };
+        nuevosVisibles[dep.key] = false; // oculto por defecto
       }
     }
     setTablas(nuevasTablas);
     setResumen(nuevoResumen);
+    setVisibles(nuevosVisibles);
   };
 
   const handleToggle = (dep) => {
@@ -110,43 +120,56 @@ export default function ExcelMultiUpload() {
 
   return (
     <div className="excel-upload">
-      <h2>Subir archivos Excel (uno por departamento)</h2>
-      {DEPARTAMENTOS.map(dep => (
-        <div key={dep.key} style={{marginBottom:'1rem'}}>
-          <label style={{fontWeight:600}}>{dep.label}: </label>
-          <input type="file" accept=".xlsx,.xls" onChange={e => handleFile(e, dep.key)} />
-          {archivos[dep.key] && <span style={{marginLeft:'1rem'}}>{archivos[dep.key].name}</span>}
-          <button style={{marginLeft:'1rem'}} onClick={() => handleToggle(dep.key)} disabled={!tablas[dep.key]}>Ver/Ocultar tabla</button>
-        </div>
-      ))}
+      <h2>Subir archivos Excel (uno por departamento, en orden: Arenales, Tucuman, Paraguay)</h2>
+      <input
+        type="file"
+        accept=".xlsx,.xls"
+        multiple
+        onChange={handleFiles}
+        style={{marginBottom:'1.5rem'}}
+      />
+      <div style={{marginBottom:'1rem'}}>
+        {DEPARTAMENTOS.map(dep => (
+          <span key={dep.key} style={{marginRight:'1.5rem'}}>
+            <strong>{dep.label}:</strong> {archivos[dep.key]?.name || 'Sin archivo'}
+          </span>
+        ))}
+      </div>
       <button style={{marginTop:'1.5rem'}} onClick={handleProcesar}>Procesar archivos</button>
       {DEPARTAMENTOS.map(dep => (
-        tablas[dep.key] && visibles[dep.key] && (
+        tablas[dep.key] && (
           <div key={dep.key+"tabla"} style={{marginTop:'2rem'}}>
-            <h3>Tabla {dep.label}</h3>
-            <div className="excel-table-wrapper">
-              <table className="excel-table">
-                <thead>
-                  <tr>
-                    {COLUMNAS.map((col, i) => <th key={i}>{col}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {tablas[dep.key].data.map((row, i) => (
-                    <tr key={i}>
-                      {row.map((cell, j) => <td key={j}>{cell}</td>)}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="ganancia-final">
-              <strong>Gastos fijos {dep.label}: </strong>ARS {gastosFijos[dep.key]}
-              <br/>
-              <strong>Total Pago VERDADERO (USD): </strong>{tablas[dep.key].totalUSD?.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}
-              <br/>
-              <strong>Ganancia neta del mes (en pesos): </strong>ARS {tablas[dep.key].ganancia?.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})}
-            </div>
+            <button onClick={() => handleToggle(dep.key)} style={{marginBottom:'0.7rem'}}>
+              {visibles[dep.key] ? 'Ocultar tabla' : 'Ver tabla'}
+            </button>
+            {visibles[dep.key] && (
+              <>
+                <h3>Tabla {dep.label}</h3>
+                <div className="excel-table-wrapper">
+                  <table className="excel-table">
+                    <thead>
+                      <tr>
+                        {COLUMNAS.map((col, i) => <th key={i}>{col}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tablas[dep.key].data.map((row, i) => (
+                        <tr key={i}>
+                          {row.map((cell, j) => <td key={j}>{cell}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="ganancia-final">
+                  <strong>Gastos fijos {dep.label}: </strong>ARS {gastosFijos[dep.key]}
+                  <br/>
+                  <strong>Total Pago VERDADERO (USD): </strong>{tablas[dep.key].totalUSD?.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}
+                  <br/>
+                  <strong>Ganancia neta del mes (en pesos): </strong>ARS {tablas[dep.key].ganancia?.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})}
+                </div>
+              </>
+            )}
           </div>
         )
       ))}
