@@ -135,7 +135,7 @@ export default function ExcelMultiUpload() {
 
   return (
     <div className="excel-upload">
-      <h2>Subir archivos Excel (uno por departamento, en orden: Arenales, Tucuman, Paraguay)</h2>
+      <h2>Subir archivos Excel</h2>
       <input
         type="file"
         accept=".xlsx,.xls"
