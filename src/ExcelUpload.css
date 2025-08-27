@@ -1,73 +1,415 @@
 .excel-upload {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 2rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 16px;
-  background: #fcfcff;
-  box-shadow: 0 2px 8px #0001;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
 }
+
+.excel-upload::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2563eb, #7c3aed, #ec4899);
+}
+
 .excel-upload h2 {
-  margin-bottom: 1.5rem;
-  font-size: 2rem;
+  margin-bottom: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   text-align: center;
+  color: #1f2937;
+  position: relative;
 }
-.excel-upload input[type="file"] {
+
+.excel-upload h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  border-radius: 2px;
+}
+
+/* Área de carga de archivos mejorada */
+.file-upload-area {
+  position: relative;
   margin-bottom: 2rem;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
+
+.excel-upload input[type="file"] {
+  width: 100%;
+  padding: 2rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #64748b;
+  position: relative;
+  overflow: hidden;
+}
+
+.excel-upload input[type="file"]:hover {
+  border-color: #2563eb;
+  background: linear-gradient(145deg, #eff6ff, #dbeafe);
+  color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+}
+
+.excel-upload input[type="file"]:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+/* Indicadores de archivos */
+.file-indicators {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(248, 250, 252, 0.8);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.file-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.file-indicator:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-indicator .icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
+  font-weight: bold;
+}
+
+.file-indicator.has-file .icon {
+  background: #10b981;
+}
+
+.file-indicator:not(.has-file) .icon {
+  background: #94a3b8;
+}
+
+.file-indicator .label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.file-indicator .filename {
+  color: #6b7280;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Botón de procesar mejorado */
+.process-button {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  display: block;
+  margin: 0 auto 2rem auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.process-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+.process-button:active {
+  transform: translateY(0);
+}
+
+.process-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.process-button:hover::before {
+  left: 100%;
+}
+
+/* Tablas mejoradas */
+.table-section {
+  margin-bottom: 3rem;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.table-header {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-toggle {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-toggle:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.table-toggle .icon {
+  transition: transform 0.2s ease;
+}
+
+.table-toggle.expanded .icon {
+  transform: rotate(180deg);
+}
+
+.table-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
 .excel-table-wrapper {
   overflow-x: auto;
+  background: white;
 }
+
 .excel-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: #fff;
-  font-size: 1.05rem;
+  background: white;
+  font-size: 0.95rem;
 }
-.excel-table th, .excel-table td {
-  border: 1px solid #bfc4d1;
-  padding: 0.7rem 1rem;
-  text-align: left;
-}
+
 .excel-table th {
-  background: #eaeaff;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  color: #374151;
   font-weight: 700;
-  color: #222;
-}
-.excel-table tr:nth-child(even) td {
-  background: #f6f7fa;
-}
-.excel-table tr:hover td {
-  background: #f0f4ff;
-}
-.ganancia-final {
-  margin: 2rem auto 0 auto;
-  max-width: 600px;
-  background: #f7fbe7;
-  border: 1px solid #c6e1a7;
-  border-radius: 8px;
-  padding: 1.5rem 2rem;
-  font-size: 1.2rem;
-  color: #2d4a1b;
+  padding: 1rem;
   text-align: left;
-  box-shadow: 0 1px 4px #0001;
+  border-bottom: 2px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
+
+.excel-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #374151;
+  transition: background-color 0.2s ease;
+}
+
+.excel-table tr:hover td {
+  background: #f8fafc;
+}
+
+.excel-table tr:nth-child(even) td {
+  background: #fafbfc;
+}
+
+.excel-table tr:nth-child(even):hover td {
+  background: #f1f5f9;
+}
+
+/* Sección de resultados mejorada */
+.ganancia-final {
+  margin: 2rem 0;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border: 1px solid #a7f3d0;
+  border-radius: 16px;
+  padding: 2rem;
+  color: #065f46;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.ganancia-final::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.ganancia-final h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #065f46;
+}
+
 .ganancia-final strong {
-  color: #1a2b0a;
+  color: #047857;
+  font-weight: 700;
 }
-.excel-upload label select {
-  margin-left: 1rem;
-  font-size: 1rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: 4px;
-  border: 1px solid #bbb;
+
+.ganancia-final .metric {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
-.excel-upload label {
-  margin-bottom: 1.5rem;
-  display: block;
+
+.ganancia-final .metric:last-child {
+  margin-bottom: 0;
+}
+
+/* Resumen final destacado */
+.summary-final {
+  background: linear-gradient(135deg, #fef3c7, #fed7aa) !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+  margin-top: 3rem !important;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2) !important;
+}
+
+.summary-final::before {
+  background: linear-gradient(90deg, #f59e0b, #d97706) !important;
+}
+
+.summary-final h3 {
+  color: #92400e !important;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.summary-final strong {
+  color: #78350f !important;
+}
+
+.summary-final .total-highlight {
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  margin-top: 1rem;
+  border: 1px solid rgba(120, 53, 15, 0.2);
+}
+
+/* Loading states */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.loading::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .excel-upload {
+    margin: 0 1rem;
+    padding: 1.5rem;
+  }
+
+  .file-indicators {
+    grid-template-columns: 1fr;
+  }
+
+  .table-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .excel-table {
+    font-size: 0.85rem;
+  }
+
+  .excel-table th,
+  .excel-table td {
+    padding: 0.5rem;
+  }
+
+  .ganancia-final {
+    padding: 1.5rem;
+    font-size: 0.95rem;
+  }
 }

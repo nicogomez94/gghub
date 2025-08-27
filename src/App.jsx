@@ -8,12 +8,24 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Control de Reservas - Importar Excel</h1>
-      <nav style={{marginBottom:'2rem'}}>
-        <button onClick={() => setPantalla('excel')}>Importar Excels</button>
-        <button onClick={() => setPantalla('gastos')}>Cargar Gastos Fijos</button>
+      <h1>🏢 Control de Reservas - Gestión de Departamentos</h1>
+      <nav>
+        <button 
+          className={pantalla === 'excel' ? 'active' : ''} 
+          onClick={() => setPantalla('excel')}
+        >
+          📊 Importar Excels
+        </button>
+        <button 
+          className={pantalla === 'gastos' ? 'active' : ''} 
+          onClick={() => setPantalla('gastos')}
+        >
+          💰 Gastos Fijos
+        </button>
       </nav>
-      {pantalla === 'excel' ? <ExcelMultiUpload /> : <GastosForm />}
+      <div className="fade-in">
+        {pantalla === 'excel' ? <ExcelMultiUpload /> : <GastosForm />}
+      </div>
     </div>
   );
 }

@@ -18,7 +18,7 @@ const COLUMNAS = [
 ];
 
 const STORAGE_KEY = 'gastos_fijos_dptos';
-const DOLAR = 1300;
+const DOLAR = 1350;
 
 function parsePrice(value) {
   if (typeof value === 'number') return value;
@@ -135,31 +135,56 @@ export default function ExcelMultiUpload() {
 
   return (
     <div className="excel-upload">
-      <h2>Subir archivos Excel</h2>
-      <input
-        type="file"
-        accept=".xlsx,.xls"
-        multiple
-        onChange={handleFiles}
-        style={{marginBottom:'1.5rem'}}
-      />
-      <div style={{marginBottom:'1rem'}}>
+      <h2>📊 Gestión de Archivos Excel</h2>
+      
+      <div className="file-upload-area">
+        <input
+          type="file"
+          accept=".xlsx,.xls"
+          multiple
+          onChange={handleFiles}
+          placeholder="📁 Arrastra tus archivos aquí o haz clic para seleccionar"
+        />
+      </div>
+      
+      <div className="file-indicators">
         {DEPARTAMENTOS.map(dep => (
-          <span key={dep.key} style={{marginRight:'1.5rem'}}>
-            <strong>{dep.label}:</strong> {archivos[dep.key]?.name || 'Sin archivo'}
-          </span>
+          <div 
+            key={dep.key} 
+            className={`file-indicator ${archivos[dep.key] ? 'has-file' : ''}`}
+          >
+            <div className="icon">
+              {archivos[dep.key] ? '✓' : '○'}
+            </div>
+            <div>
+              <div className="label">{dep.label}</div>
+              <div className="filename">
+                {archivos[dep.key]?.name || 'Sin archivo seleccionado'}
+              </div>
+            </div>
+          </div>
         ))}
       </div>
-      <button style={{marginTop:'1.5rem'}} onClick={handleProcesar}>Procesar archivos</button>
+      
+      <button className="process-button btn-primary" onClick={handleProcesar}>
+        🚀 Procesar Archivos
+      </button>
       {DEPARTAMENTOS.map(dep => (
         tablas[dep.key] && (
-          <div key={dep.key+"tabla"} style={{marginTop:'2rem'}}>
-            <button onClick={() => handleToggle(dep.key)} style={{marginBottom:'0.7rem'}}>
-              {visibles[dep.key] ? 'Ocultar tabla' : 'Ver tabla'}
-            </button>
+          <div key={dep.key+"tabla"} className="table-section">
+            <div className="table-header">
+              <h3 className="table-title">📋 Tabla {dep.label}</h3>
+              <button 
+                className={`table-toggle ${visibles[dep.key] ? 'expanded' : ''}`}
+                onClick={() => handleToggle(dep.key)}
+              >
+                <span className="icon">▼</span>
+                {visibles[dep.key] ? 'Ocultar tabla' : 'Ver tabla'}
+              </button>
+            </div>
+            
             {visibles[dep.key] && (
-              <>
-                <h3>Tabla {dep.label}</h3>
+              <div className="fade-in">
                 <div className="excel-table-wrapper">
                   <table className="excel-table">
                     <thead>
@@ -176,31 +201,49 @@ export default function ExcelMultiUpload() {
                     </tbody>
                   </table>
                 </div>
+                
                 <div className="ganancia-final">
-                  <strong>Gastos fijos {dep.label}: </strong>ARS {gastosFijos[dep.key]}
-                  <br/>
-                  <strong>Total Pago VERDADERO (USD): </strong>{tablas[dep.key].totalUSD?.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}
-                  <br/>
-                  <strong>Ganancia neta del mes (en pesos): </strong>ARS {tablas[dep.key].ganancia?.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})}
-                  <br/>
-                  <strong>Días ocupados en el mes: </strong>{tablas[dep.key].ocupacion}
+                  <div className="metric">
+                    <strong>💰 Gastos fijos {dep.label}:</strong> ARS {Number(gastosFijos[dep.key]).toLocaleString('es-AR', {maximumFractionDigits:0})}
+                  </div>
+                  <div className="metric">
+                    <strong>💵 Total Pago VERDADERO (USD):</strong> ${tablas[dep.key].totalUSD?.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}
+                  </div>
+                  <div className="metric">
+                    <strong>💸 Total Pago VERDADERO (ARS):</strong> ARS {Math.round(tablas[dep.key].totalUSD * DOLAR).toLocaleString('es-AR', {maximumFractionDigits:0})}
+                  </div>
+                  <div className="metric">
+                    <strong>📈 Ganancia neta del mes:</strong> ARS {Math.round(tablas[dep.key].ganancia)?.toLocaleString('es-AR', {maximumFractionDigits:0})}
+                  </div>
+                  <div className="metric">
+                    <strong>📅 Días ocupados en el mes:</strong> {tablas[dep.key].ocupacion} días
+                  </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
         )
       ))}
       {Object.keys(resumen).length > 0 && (
-        <div className="ganancia-final" style={{marginTop:'2.5rem',background:'#eafbe7',border:'1px solid #b6e1a7'}}>
-          <h3>Resumen final</h3>
+        <div className="ganancia-final summary-final">
+          <h3>🎯 Resumen Mensual Consolidado</h3>
+          
           {DEPARTAMENTOS.map(dep => (
-            <div key={dep.key}>
-              <strong>{dep.label}:</strong> ARS {resumen[dep.key]?.ganancia?.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})} | Días ocupados: {resumen[dep.key]?.ocupacion}
-            </div>
+            resumen[dep.key] && (
+              <div key={dep.key} className="metric">
+                <strong>🏢 {dep.label}:</strong> ARS {Math.round(resumen[dep.key]?.ganancia || 0).toLocaleString('es-AR', {maximumFractionDigits:0})} | 📅 Días ocupados: {resumen[dep.key]?.ocupacion}
+              </div>
+            )
           ))}
-          <div style={{marginTop:'1rem',fontWeight:'bold',fontSize:'1.2rem'}}>
-            Ganancia total: ARS {totalFinal.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})} <br/>
-            Ocupación total del mes: {ocupacionTotal} días
+          
+          <div className="total-highlight">
+            <div style={{marginBottom:'0.5rem'}}>
+              <strong>💰 Ganancia Total del Mes:</strong><br/>
+              ARS {Math.round(totalFinal).toLocaleString('es-AR', {maximumFractionDigits:0})}
+            </div>
+            <div>
+              <strong>📊 Ocupación Total:</strong> {ocupacionTotal} días
+            </div>
           </div>
         </div>
       )}

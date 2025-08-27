@@ -1,46 +1,248 @@
 .gastos-form {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fafbfc;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 3rem;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 2rem;
+  position: relative;
+  overflow: hidden;
 }
+
+.gastos-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
 .gastos-form h2 {
-  margin-bottom: 1rem;
+  margin: 0 0 1rem 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  color: #1f2937;
+  position: relative;
 }
+
+.gastos-form h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 2px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
 .gastos-form label {
   display: flex;
   flex-direction: column;
   text-align: left;
-  font-weight: 500;
-  gap: 0.25rem;
-}
-.gastos-form input[type="number"] {
-  padding: 0.5rem;
-  border: 1px solid #bbb;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-.gastos-form button {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #646cff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.gastos-form button:hover {
-  background: #4b51c6;
-}
-.gastos-msg {
-  margin-top: 1rem;
-  color: #1a2b0a;
   font-weight: 600;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.gastos-form label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: #10b981;
+}
+
+.gastos-form label::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: transparent;
+  transition: background 0.3s ease;
+}
+
+.gastos-form label:hover::before {
+  background: linear-gradient(180deg, #10b981, #059669);
+}
+
+.label-text {
+  font-size: 1.1rem;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.department-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.gastos-form input[type="number"] {
+  padding: 1rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: white;
+  color: #1f2937;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.gastos-form input[type="number"]:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+  background: #fafbfc;
+}
+
+.gastos-form input[type="number"]:hover {
+  border-color: #10b981;
+}
+
+.submit-button {
+  margin-top: 1rem;
+  padding: 1.25rem 2rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.submit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.submit-button:active {
+  transform: translateY(-1px);
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.submit-button:hover::before {
+  left: 100%;
+}
+
+.gastos-msg {
+  margin-top: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
+  font-weight: 600;
+  border-radius: 12px;
+  border: 1px solid #6ee7b7;
+  text-align: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+  animation: slideIn 0.3s ease-out;
+}
+
+.gastos-msg::before {
+  content: '✅ ';
+  margin-right: 0.5rem;
+}
+
+/* Información adicional */
+.info-section {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-radius: 12px;
+  border: 1px solid #93c5fd;
+  color: #1e40af;
+}
+
+.info-section h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-section p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .gastos-form {
+    margin: 0 1rem;
+    padding: 2rem 1.5rem;
+  }
+
+  .gastos-form h2 {
+    font-size: 1.8rem;
+  }
+
+  .gastos-form label {
+    padding: 1rem;
+  }
+
+  .label-text {
+    font-size: 1rem;
+  }
+
+  .gastos-form input[type="number"] {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+  }
+
+  .submit-button {
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+  }
 }
